@@ -1,0 +1,14 @@
+{
+  "event": {
+    "sender": {
+      "sender_id": {
+        "open_id": "ou_x"
+      }
+    },
+    "message": {
+      "message_id": "om_text_chat",
+      "message_type": "text",
+      "content": "{\"text\":\"收到\"}"
+    }
+  }
+}
