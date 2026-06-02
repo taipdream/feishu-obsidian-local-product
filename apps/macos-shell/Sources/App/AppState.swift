@@ -7,6 +7,7 @@ final class AppState: ObservableObject {
     @Published private(set) var backendRunning: Bool = false
     @Published private(set) var statusMessage: String
     @Published var lastError: String?
+    @Published var shouldShowOnboardingWindow: Bool
 
     let defaultVaultPath: String
 
@@ -30,12 +31,15 @@ final class AppState: ObservableObject {
         self.statusProvider = statusProvider
         self.fileManager = fileManager
         self.defaultVaultPath = "\(fileManager.homeDirectoryForCurrentUser.path)/Documents/InsightVault"
+        self.shouldShowOnboardingWindow = false
 
         if let loaded = try? configStore.loadConfiguration() {
             self.configuration = loaded
             self.statusMessage = "Ready to start backend"
+            self.shouldShowOnboardingWindow = false
         } else {
             self.statusMessage = "Finish onboarding"
+            self.shouldShowOnboardingWindow = true
         }
     }
 
@@ -45,6 +49,7 @@ final class AppState: ObservableObject {
         self.configuration = configuration
         self.statusMessage = "Configuration saved"
         self.lastError = nil
+        self.shouldShowOnboardingWindow = false
     }
 
     func startBackend() throws {

@@ -46,6 +46,7 @@ func testDefaultVaultPathUsesDocumentsInsightVault() {
         )
     )
     #expect(state.defaultVaultPath.hasSuffix("/Documents/InsightVault"))
+    #expect(state.shouldShowOnboardingWindow)
 }
 
 @MainActor
@@ -87,6 +88,7 @@ func testSaveConfigurationCreatesVaultSkeletonAndPersistsConfig() throws {
     #expect(FileManager.default.fileExists(atPath: vaultRoot.appendingPathComponent("00 Inbox").path))
     #expect(FileManager.default.fileExists(atPath: vaultRoot.appendingPathComponent("99 System").path))
     #expect(state.isConfigured)
+    #expect(!state.shouldShowOnboardingWindow)
 }
 
 @MainActor

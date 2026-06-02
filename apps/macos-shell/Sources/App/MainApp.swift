@@ -8,5 +8,12 @@ struct FeishuObsidianLocalApp: App {
         MenuBarExtra("Feishu Obsidian Local", systemImage: "tray.full") {
             StatusMenuView(appState: appState)
         }
+        WindowGroup("Feishu Obsidian Local") {
+            if appState.shouldShowOnboardingWindow {
+                OnboardingView(appState: appState)
+            } else {
+                StatusMenuView(appState: appState)
+            }
+        }
     }
 }
