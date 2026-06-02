@@ -1,0 +1,8 @@
+{
+  "id": "feishu-obsidian-local-status",
+  "name": "Feishu Obsidian Local Status",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Shows local product status inside Obsidian.",
+  "author": "taipdream"
+}
