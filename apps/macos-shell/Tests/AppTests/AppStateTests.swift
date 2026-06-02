@@ -18,12 +18,33 @@ private final class FakeBackendController: BackendControlling {
     }
 }
 
+private struct FakeStatusProvider: BackendStatusProviding {
+    let status: BackendStatus
+
+    func fetchStatus() throws -> BackendStatus {
+        status
+    }
+}
+
 @MainActor
 @Test
 func testDefaultVaultPathUsesDocumentsInsightVault() {
     let tempRoot = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     let store = ConfigStore(configURL: tempRoot.appendingPathComponent("config.json"))
-    let state = AppState(configStore: store, backendController: FakeBackendController())
+    let state = AppState(
+        configStore: store,
+        backendController: FakeBackendController(),
+        statusProvider: FakeStatusProvider(
+            status: BackendStatus(
+                backend_running: false,
+                vault_ready: false,
+                feishu_connected: false,
+                last_ingest_status: "",
+                last_reply_status: "",
+                action_needed: "Finish onboarding"
+            )
+        )
+    )
     #expect(state.defaultVaultPath.hasSuffix("/Documents/InsightVault"))
 }
 
@@ -35,7 +56,20 @@ func testSaveConfigurationCreatesVaultSkeletonAndPersistsConfig() throws {
     let configURL = tempRoot.appendingPathComponent("config.json")
     let store = ConfigStore(configURL: configURL)
     let backendController = FakeBackendController()
-    let state = AppState(configStore: store, backendController: backendController)
+    let state = AppState(
+        configStore: store,
+        backendController: backendController,
+        statusProvider: FakeStatusProvider(
+            status: BackendStatus(
+                backend_running: false,
+                vault_ready: true,
+                feishu_connected: false,
+                last_ingest_status: "",
+                last_reply_status: "",
+                action_needed: "Ready to start backend"
+            )
+        )
+    )
 
     let config = ProductConfiguration(
         vaultRoot: vaultRoot.path,
@@ -63,7 +97,20 @@ func testStartBackendUsesSavedConfigurationEnvironment() throws {
     let configURL = tempRoot.appendingPathComponent("config.json")
     let store = ConfigStore(configURL: configURL)
     let backendController = FakeBackendController()
-    let state = AppState(configStore: store, backendController: backendController)
+    let state = AppState(
+        configStore: store,
+        backendController: backendController,
+        statusProvider: FakeStatusProvider(
+            status: BackendStatus(
+                backend_running: true,
+                vault_ready: true,
+                feishu_connected: false,
+                last_ingest_status: "",
+                last_reply_status: "",
+                action_needed: "Ready"
+            )
+        )
+    )
 
     let config = ProductConfiguration(
         vaultRoot: vaultRoot.path,
@@ -81,4 +128,6 @@ func testStartBackendUsesSavedConfigurationEnvironment() throws {
     #expect(backendController.lastEnvironment["FEISHU_APP_ID"] == "app-id")
     #expect(backendController.lastEnvironment["FEISHU_VERIFICATION_TOKEN"] == "verify-token")
     #expect(backendController.lastEnvironment["VAULT_ROOT"] == vaultRoot.path)
+    #expect(state.backendRunning)
+    #expect(state.statusMessage == "Ready")
 }

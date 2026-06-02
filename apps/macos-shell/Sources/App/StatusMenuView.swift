@@ -21,6 +21,13 @@ struct StatusMenuView: View {
                             .font(.caption2)
                             .foregroundStyle(.red)
                     }
+                    Button("Refresh Status") {
+                        do {
+                            try appState.refreshStatus()
+                        } catch {
+                            appState.lastError = error.localizedDescription
+                        }
+                    }
                     Button(appState.backendRunning ? "Stop Backend" : "Start Backend") {
                         do {
                             if appState.backendRunning {

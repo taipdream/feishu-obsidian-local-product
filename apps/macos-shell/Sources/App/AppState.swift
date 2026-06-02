@@ -12,6 +12,7 @@ final class AppState: ObservableObject {
 
     private let configStore: ConfigStore
     private let backendController: BackendControlling
+    private let statusProvider: BackendStatusProviding
     private let fileManager: FileManager
 
     var isConfigured: Bool {
@@ -21,10 +22,12 @@ final class AppState: ObservableObject {
     init(
         configStore: ConfigStore = ConfigStore(configURL: AppPaths.defaultConfigURL()),
         backendController: BackendControlling = BackendProcessController(),
+        statusProvider: BackendStatusProviding = HTTPBackendStatusProvider(),
         fileManager: FileManager = .default
     ) {
         self.configStore = configStore
         self.backendController = backendController
+        self.statusProvider = statusProvider
         self.fileManager = fileManager
         self.defaultVaultPath = "\(fileManager.homeDirectoryForCurrentUser.path)/Documents/InsightVault"
 
@@ -51,15 +54,20 @@ final class AppState: ObservableObject {
         }
 
         try backendController.startBackend(executableURL: nil, environment: makeBackendEnvironment(from: configuration))
-        backendRunning = backendController.isRunning
-        statusMessage = backendRunning ? "Backend running" : "Backend failed to start"
-        lastError = nil
+        try refreshStatus()
     }
 
     func stopBackend() {
         backendController.stopBackend()
         backendRunning = backendController.isRunning
         statusMessage = configuration == nil ? "Finish onboarding" : "Backend stopped"
+    }
+
+    func refreshStatus() throws {
+        let status = try statusProvider.fetchStatus()
+        backendRunning = status.backend_running
+        statusMessage = status.action_needed
+        lastError = nil
     }
 
     private func ensureVaultSkeleton(vaultRoot: String) throws {
