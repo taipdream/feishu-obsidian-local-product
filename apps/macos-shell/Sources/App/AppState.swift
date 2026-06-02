@@ -20,6 +20,47 @@ final class AppState: ObservableObject {
         configuration != nil
     }
 
+    var onboardingTitle: String {
+        "Set up your knowledge vault"
+    }
+
+    var onboardingDescription: String {
+        "Connect Feishu to this Mac and store everything in your local Obsidian vault."
+    }
+
+    var statusHeadline: String {
+        if !isConfigured {
+            return "Setup required"
+        }
+        if backendRunning {
+            return "Assistant is running"
+        }
+        if let lastError, !lastError.isEmpty {
+            return "Action needed"
+        }
+        return "Ready to start"
+    }
+
+    var statusDetail: String {
+        if !isConfigured {
+            return "Finish the fields below, then save your setup."
+        }
+        if let lastError, !lastError.isEmpty {
+            return lastError
+        }
+        if backendRunning {
+            return "Feishu is connected through your local assistant on this Mac."
+        }
+        return "Your vault and keys are saved. Start the assistant when you want Feishu to sync."
+    }
+
+    var primaryActionLabel: String {
+        if !isConfigured {
+            return "Save setup"
+        }
+        return backendRunning ? "Stop assistant" : "Start assistant"
+    }
+
     init(
         configStore: ConfigStore = ConfigStore(configURL: AppPaths.defaultConfigURL()),
         backendController: BackendControlling = BackendProcessController(),

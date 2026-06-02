@@ -133,3 +133,70 @@ func testStartBackendUsesSavedConfigurationEnvironment() throws {
     #expect(state.backendRunning)
     #expect(state.statusMessage == "Ready")
 }
+
+@MainActor
+@Test
+func testFriendFacingCopyForUnconfiguredState() {
+    let tempRoot = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    let store = ConfigStore(configURL: tempRoot.appendingPathComponent("config.json"))
+    let state = AppState(
+        configStore: store,
+        backendController: FakeBackendController(),
+        statusProvider: FakeStatusProvider(
+            status: BackendStatus(
+                backend_running: false,
+                vault_ready: false,
+                feishu_connected: false,
+                last_ingest_status: "",
+                last_reply_status: "",
+                action_needed: "Finish onboarding"
+            )
+        )
+    )
+
+    #expect(state.onboardingTitle == "Set up your knowledge vault")
+    #expect(state.onboardingDescription.contains("Obsidian"))
+    #expect(state.statusHeadline == "Setup required")
+    #expect(state.statusDetail.contains("Finish the fields"))
+    #expect(state.primaryActionLabel == "Save setup")
+}
+
+@MainActor
+@Test
+func testFriendFacingCopyForConfiguredAndRunningState() throws {
+    let tempRoot = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    let vaultRoot = tempRoot.appendingPathComponent("InsightVault")
+    let configURL = tempRoot.appendingPathComponent("config.json")
+    let store = ConfigStore(configURL: configURL)
+    let backendController = FakeBackendController()
+    let state = AppState(
+        configStore: store,
+        backendController: backendController,
+        statusProvider: FakeStatusProvider(
+            status: BackendStatus(
+                backend_running: true,
+                vault_ready: true,
+                feishu_connected: true,
+                last_ingest_status: "",
+                last_reply_status: "",
+                action_needed: "Ready"
+            )
+        )
+    )
+
+    try state.saveConfiguration(
+        ProductConfiguration(
+            vaultRoot: vaultRoot.path,
+            feishuAppID: "app-id",
+            feishuAppSecret: "app-secret",
+            feishuVerificationToken: "verify-token",
+            feishuEncryptKey: "encrypt-key",
+            tavilyAPIKey: "tavily-key"
+        )
+    )
+    try state.refreshStatus()
+
+    #expect(state.statusHeadline == "Assistant is running")
+    #expect(state.statusDetail.contains("Feishu"))
+    #expect(state.primaryActionLabel == "Stop assistant")
+}

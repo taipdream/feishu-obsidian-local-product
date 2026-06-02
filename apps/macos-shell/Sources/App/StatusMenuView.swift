@@ -7,10 +7,13 @@ struct StatusMenuView: View {
         Group {
             if appState.isConfigured {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Feishu Obsidian Local")
+                    Text(appState.statusHeadline)
                         .font(.headline)
-                    Text(appState.statusMessage)
+                    Text(appState.statusDetail)
                         .font(.caption)
+                    Text("Vault location")
+                        .font(.caption2)
+                        .fontWeight(.semibold)
                     if let configuration = appState.configuration {
                         Text(configuration.vaultRoot)
                             .font(.caption2)
@@ -28,7 +31,7 @@ struct StatusMenuView: View {
                             appState.lastError = error.localizedDescription
                         }
                     }
-                    Button(appState.backendRunning ? "Stop Backend" : "Start Backend") {
+                    Button(appState.primaryActionLabel) {
                         do {
                             if appState.backendRunning {
                                 appState.stopBackend()
