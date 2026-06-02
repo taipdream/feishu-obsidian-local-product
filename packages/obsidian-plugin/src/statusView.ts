@@ -5,5 +5,6 @@ export function renderStatusSummary(status: BackendStatus): string {
     `Backend running: ${status.backend_running}`,
     `Vault ready: ${status.vault_ready}`,
     `Feishu connected: ${status.feishu_connected}`,
+    `Action needed: ${status.action_needed}`,
   ].join("\n");
 }

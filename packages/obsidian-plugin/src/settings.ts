@@ -4,6 +4,7 @@ export type BackendStatus = {
   feishu_connected: boolean;
   last_ingest_status: string;
   last_reply_status: string;
+  action_needed: string;
 };
 
 export async function fetchBackendStatus(baseUrl: string): Promise<BackendStatus> {

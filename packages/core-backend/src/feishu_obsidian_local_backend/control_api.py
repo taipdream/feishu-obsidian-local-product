@@ -11,4 +11,5 @@ def get_status() -> dict:
         "feishu_connected": False,
         "last_ingest_status": "",
         "last_reply_status": "",
+        "action_needed": "Finish onboarding",
     }
