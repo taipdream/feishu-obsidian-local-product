@@ -3,14 +3,20 @@ import Foundation
 @testable import App
 
 @Test
-func testConfigStoreWritesMachineLocalJSON() throws {
+func testConfigStoreWritesMachineLocalConfiguration() throws {
     let temp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     let store = ConfigStore(configURL: temp.appendingPathComponent("config.json"))
-    try store.save([
-        "vaultRoot": "/Users/test/Documents/InsightVault",
-        "providerType": "minimax"
-    ])
+    let config = ProductConfiguration(
+        vaultRoot: "/Users/test/Documents/InsightVault",
+        feishuAppID: "app-id",
+        feishuAppSecret: "secret",
+        feishuVerificationToken: "verification",
+        feishuEncryptKey: "encrypt",
+        tavilyAPIKey: "tavily"
+    )
 
-    let loaded = try store.load()
-    #expect(loaded["providerType"] as? String == "minimax")
+    try store.saveConfiguration(config)
+
+    let loaded = try store.loadConfiguration()
+    #expect(loaded == config)
 }

@@ -37,9 +37,12 @@ Machine-local configuration is stored on the Mac and is not written into the sha
 The user still needs to provide:
 
 - their own Obsidian installation
-- their own Feishu app credentials
-- their own model API key
-- their own search API key, if web enrichment is enabled
+- their own Feishu app credentials:
+  - App ID
+  - App Secret
+  - Verification Token
+  - Encrypt Key
+- their own Tavily API key, if web enrichment is enabled
 
 ## Current release scope
 

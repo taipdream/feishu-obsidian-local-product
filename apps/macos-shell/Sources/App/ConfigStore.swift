@@ -7,18 +7,18 @@ final class ConfigStore {
         self.configURL = configURL
     }
 
-    func save(_ payload: [String: Any]) throws {
+    func saveConfiguration(_ payload: ProductConfiguration) throws {
         try FileManager.default.createDirectory(
             at: configURL.deletingLastPathComponent(),
             withIntermediateDirectories: true
         )
-        let data = try JSONSerialization.data(withJSONObject: payload, options: [.prettyPrinted])
+        let data = try JSONEncoder().encode(payload)
         try data.write(to: configURL)
     }
 
-    func load() throws -> [String: Any] {
-        guard FileManager.default.fileExists(atPath: configURL.path) else { return [:] }
+    func loadConfiguration() throws -> ProductConfiguration? {
+        guard FileManager.default.fileExists(atPath: configURL.path) else { return nil }
         let data = try Data(contentsOf: configURL)
-        return try JSONSerialization.jsonObject(with: data) as? [String: Any] ?? [:]
+        return try JSONDecoder().decode(ProductConfiguration.self, from: data)
     }
 }
