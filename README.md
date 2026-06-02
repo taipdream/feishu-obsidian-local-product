@@ -21,3 +21,15 @@ Outputs:
 ## Install notes
 
 See `docs/installing-unsigned-builds.md`.
+
+## Smoke test the packaged app
+
+```bash
+chmod +x ./scripts/smoke_test_packaged_app.sh
+./scripts/smoke_test_packaged_app.sh
+```
+
+Expected result:
+
+- the command prints the packaged app's local `/status` JSON
+- `backend_running`, `vault_ready`, and `feishu_connected` should all be `true` in the smoke environment

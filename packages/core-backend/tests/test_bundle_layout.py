@@ -13,3 +13,10 @@ def test_backend_bundle_entrypoint_mentions_status_api_server():
     text = entrypoint.read_text(encoding="utf-8")
     assert "uvicorn" in text
     assert "control_api:app" in text
+    assert "SKIP_FEISHU_WS" in text
+
+
+def test_backend_bundle_runtime_contains_uvicorn():
+    root = Path(__file__).resolve().parents[1]
+    runtime_bin = root / "dist" / "backend-bundle" / "runtime" / "bin"
+    assert (runtime_bin / "uvicorn").exists()

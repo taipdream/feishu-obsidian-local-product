@@ -7,6 +7,7 @@ DIST="$ROOT/dist/backend-bundle"
 rm -rf "$DIST"
 mkdir -p "$DIST"
 python3 -m venv "$DIST/runtime"
+"$DIST/runtime/bin/python" -m pip install "$ROOT"
 cp -R "$ROOT/src" "$DIST/app"
 
 cat > "$DIST/run_backend" <<'EOF'
@@ -23,7 +24,11 @@ cleanup() {
 }
 
 trap cleanup EXIT INT TERM
-"$ROOT/runtime/bin/python" -m feishu_obsidian_local_backend.ws_client
+if [ "${SKIP_FEISHU_WS:-0}" = "1" ]; then
+  wait "$STATUS_PID"
+else
+  "$ROOT/runtime/bin/python" -m feishu_obsidian_local_backend.ws_client
+fi
 EOF
 
 chmod +x "$DIST/run_backend"
